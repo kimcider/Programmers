@@ -5,123 +5,125 @@ import java.util.Queue;
  * https://school.programmers.co.kr/learn/courses/30/lessons/159993
  */
 
-
-
 /*
- * BFS, DFS 공부 
- * 
- */
-
-
-/*
- * 
- * TODO:
- * 
  * BFS가 최단거리 탐색에 가장 유용할 것이라고 판단. 
  * public void BFS(~~)는 시작지점부터 목적지까지의 BFS를 수행한다. 
- * BFS 과정 중 시작 - 끝까지의 거리가 얼마인지를 반환하도록 수정하면 된다. 
+ * BFS 과정 중 시작 - 끝까지의 거리가 얼마인지를 반환한다. 
  * 
- * 매 방문마다 이전 Point정보를 저장해두면 될듯 하다. 
+ * 시작점 - 레버 사이의 거리 + 레버 - 종료점 사이의 거리가 이 문제의 답이 될 것이다. 
+ * 길이 없는 경우 -1을 리턴한다. 
+ */
+
+
+/*  고려사항
  * 
- * 그렇게 한 후, 시작점 - 레버 사이의 거리 + 레버 - 종료점 사이의 거리가 이 문제의 답이 될 것이다. 
+ * visit을 queue에서 제거할 때 수행할 경우 시간초과가 뜬다. 
  * 
- * TODO: 길이 없는 경우 -1을 리턴해야한다.  
+ * queue에 넣는 순간, 해당 좌표를 visit할 것이 확정되기 때문에 큐에 넣을 때 visit을 수행하여도 상관이 없다. 
+ * 
+ *  또한, 큐에 넣을 때 visit을 수행해야 큐에 들어가는 총 원소의 갯수가 줄어들기 때문에 BFS에서는 큐에 넣을 때 visit을 수행하는 것이 timecomplexity를 매우 효과적으로 줄일 수 있다.
+ *  
  */
 class Solution{
-	Point startPoint =  new Point(3,3);
-	Point leverPoint = new Point(3,3);
+	Point startPoint;
+	Point leverPoint;
 	Point exitPoint;
+	
 	public int solution(String[] maps) {
-		
 		for(int i = 0; i < maps.length; i++) {
 			for(int j = 0; j < maps[i].length(); j++) {
-				System.out.print(maps[i].charAt(j));
-			}
-			System.out.println();
-		}
-		
-		System.out.println(startPoint.equals(leverPoint));
-		
-		
-		for(int i = 0; i < maps.length; i++) {
-			for(int j = 0; j < maps[i].length(); j++) {
-				if(maps[i].charAt(j) == 'S') {
+				char character = maps[i].charAt(j);
+				
+				if(character == 'S') {
 					startPoint = new Point(j, i);
 				}
-				if(maps[i].charAt(j) == 'L') {
+				else if(character == 'L') {
 					leverPoint = new Point(j, i);
-				}
-				if(maps[i].charAt(j) == 'E') {
-					exitPoint = new Point(j, i);
+				}else if(character == 'E') {
+					exitPoint = new Point(j, i);					
 				}
 			}
 		}
 		
 		String[] tempMaps = maps.clone();
-		int get = BFS(tempMaps, startPoint, leverPoint);
-
-		return 0;
+		int startToLeverLength = BFS(tempMaps, startPoint, leverPoint);
+		
+		tempMaps = maps.clone();
+		int leverToExitLength = BFS(tempMaps, leverPoint, exitPoint);
+		
+		if(startToLeverLength == -1 )return -1;
+		if(leverToExitLength == -1 )return -1;
+		
+		return startToLeverLength + leverToExitLength;
 	}
+	
 	private int BFS(String[] maps, Point start, Point destination) {
 		Queue<Point> queue = new LinkedList<Point>();
 		Point current = start;
 		visited(maps, current);
+		boolean findFlag = false;
+		
 		while(true) {
-			//상하좌우 체쿠 후, inqueue
+			int currentX = current.getX();
+			int currentY = current.getY();
+			//상하좌우 이동 가능한지 체크 후, Queue에 넣는다.
 			//up
-			if(current.getY() > 0) {
-				Point temp = new Point(current.getX(), current.getY() - 1);
-				if(isVisited(maps, temp) == false) {
-					queue.add(temp);
+			if(currentY > 0) {
+				if(isVisited(maps, currentX, currentY - 1) == false) {
+					Point temp = new Point(currentX, currentY - 1);
+					temp.setCounter(current);
+					queue.add(temp);	
+					visited(maps, temp);
 				}
 			}
 			//down
-			if(current.getY() < maps.length) {
-				Point  temp = new Point(current.getX(), current.getY() + 1);
-				if(isVisited(maps, temp) == false) {
-					queue.add(temp);
+			if(currentY < maps.length - 1) {
+				if(isVisited(maps, currentX, currentY + 1) == false) {
+					Point  temp = new Point(currentX, currentY + 1);
+					temp.setCounter(current);
+					queue.add(temp);	
+					visited(maps, temp);
 				}
 			}
 			
 			//left
-			if(current.getX() > 0) {
-				Point temp = new Point(current.getX() - 1, current.getY());
-				if(isVisited(maps, temp) == false) {
+			if(currentX > 0) {
+				if(isVisited(maps, currentX - 1, currentY) == false) {
+					Point temp = new Point(currentX - 1, currentY);
+					temp.setCounter(current);
 					queue.add(temp);
+					visited(maps, temp);
 				}
 			}
 			//right
-			if(current.getX() < maps[0].length()) {
-				Point temp = new Point(current.getX() + 1, current.getY());
-				if(isVisited(maps, temp) == false) {
-					queue.add(temp);
+			if(currentX < maps[0].length() - 1) {
+				if(isVisited(maps, currentX + 1, currentY) == false) {
+					Point temp = new Point(currentX + 1, currentY);
+					temp.setCounter(current);
+					queue.add(temp);	
+					visited(maps, temp);
 				}
 			}
-			
 			current = queue.poll();
-			if(current.equals(destination)) {
-				System.out.println("목적지 도착");
+			if(current == null) {
 				break;
 			}
-			
-			if(isVisited(maps, current) == false) {
-				visited(maps, current);
+			else if(current.equals(destination)) {
+				findFlag = true;
+				break;
 			}
-			
-		
-		}
-		for(int i = 0; i < maps.length; i++) {
-			for(int j = 0; j < maps[i].length(); j++) {
-				System.out.print(maps[i].charAt(j));
-			}
-			System.out.println();
 		}
 		
-		
-
-		return 0;
+		if(findFlag == true) {
+			return current.getCounter();
+		}
+		return -1;
 	}
 	
+	public boolean isVisited(String[] maps, int x, int y) {
+		if(maps[y].charAt(x) != 'X')return false;
+		return true;
+	}
 	public boolean isVisited(String[] maps, Point point) {
 		if(maps[point.getY()].charAt(point.getX()) != 'X') return false;
 		else return true;
@@ -135,10 +137,13 @@ class Solution{
 class Point{
 	int x;
 	int y;
+	
+	int counter;
 
 	public Point() {
 		x = 999;
 		y = 999;
+		counter = 0;
 	}
 	
 	public Point(int x, int y) {
@@ -162,5 +167,12 @@ class Point{
 		if(x != target.getX()) return false;
 		if(y != target.getY()) return false;
 		return true;
+	}
+	
+	public int getCounter() {
+		return counter;
+	}
+	public void setCounter(Point before) {
+		counter = before.getCounter() + 1;
 	}
 }

@@ -5,5 +5,6 @@ public class Quiz {
 		Solution solution = new Solution();
 		String[] maps = {"SOOOL","XXXXO","OOOOO","OXXXX","OOOOE"};
 		int answer = solution.solution(maps);
+		System.out.println(answer);
 	}
 }
