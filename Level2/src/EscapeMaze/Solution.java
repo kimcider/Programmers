@@ -132,47 +132,47 @@ class Solution{
 		maps[point.getY()] = maps[point.getY()].substring(0, point.getX()) + "X" + maps[point.getY()].substring(point.getX() + 1);
 	}
 
-}
 
-class Point{
-	int x;
-	int y;
+	class Point{
+		int x;
+		int y;
+		
+		int counter;
 	
-	int counter;
-
-	public Point() {
-		x = 999;
-		y = 999;
-		counter = 0;
-	}
-	
-	public Point(int x, int y) {
-		this.x = x;
-		this.y = y;
-	}
-	public void setX(int val) {
-		x = val;
-	}
-	public void setY(int val) {
-		y = val;
-	}
-	public int getX() {
-		return x;
-	}
-	public int getY() {
-		return y;
-	}
-	
-	public boolean equals(Point target) {
-		if(x != target.getX()) return false;
-		if(y != target.getY()) return false;
-		return true;
-	}
-	
-	public int getCounter() {
-		return counter;
-	}
-	public void setCounter(Point before) {
-		counter = before.getCounter() + 1;
+		public Point() {
+			x = 999;
+			y = 999;
+			counter = 0;
+		}
+		
+		public Point(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
+		public void setX(int val) {
+			x = val;
+		}
+		public void setY(int val) {
+			y = val;
+		}
+		public int getX() {
+			return x;
+		}
+		public int getY() {
+			return y;
+		}
+		
+		public boolean equals(Point target) {
+			if(x != target.getX()) return false;
+			if(y != target.getY()) return false;
+			return true;
+		}
+		
+		public int getCounter() {
+			return counter;
+		}
+		public void setCounter(Point before) {
+			counter = before.getCounter() + 1;
+		}
 	}
 }
